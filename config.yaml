@@ -12,15 +12,15 @@
 
 # NOTE: As required, change these settings before running workflow.
 
-# Group names of mock samples.
-# Ex: Mock1_S1_L001_R1_001.fastq.gz = Mock1
+# Group names of mock samples (e.g. Mock1_S1_L001_R1_001.fastq.gz = Mock1).
+# NOTE: If you don't have any mock samples, keep heading but delete list items underneath heading.
 mothurMock:
-  - Mock1
+  - KPMSA10031ng1
 
-# Group names of control samples.
-# Ex: Water1_S2_L001_R1_001.fastq.gz = Water1
+# Group names of control samples (e.g. Water1_S2_L001_R1_001.fastq.gz = Water1).
+# NOTE: If you don't have any control samples, keep heading but delete list items underneath heading.
 mothurControl:
-  - Water1
+  - 16SntcLRQC3
 
 # Desired alpha diversity metrics.
 mothurAlpha:
@@ -50,9 +50,3 @@ readNum:
 
 # Random seed
 seed: 20170415
-
-# Sample types
-mothurGroups:
-  - sample
-  - mock
-  - control
