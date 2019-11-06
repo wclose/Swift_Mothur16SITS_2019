@@ -40,15 +40,15 @@ cp PATH/TO/SEQUENCEDIR/* data/raw/
 
 <br />
 
-**3.** Create the master Snakemake environment.
-> **NOTE:** If you already have a conda environment with snakemake installed, you can skip this step.
+**3.** Create the master `snakemake` environment.
+> **NOTE:** If you already have a conda environment with `snakemake` installed, you can skip this step.
 ```
 conda env create -f envs/snakemake.yaml
 ```
 
 <br />
 
-**4.** Activate the environment that contains snakemake.
+**4.** Activate the environment that contains `snakemake`.
 ```
 conda activate snakemake
 ```
@@ -76,7 +76,7 @@ snakemake -np
 
 <br />
 
-**7.** If you want to see how everything fits together, you can run the following to generate a flowchart of the various steps. We have included the [flowchart](dag.svg) for the test data to show how everything fits together. You may need to download the resulting image locally to view it properly.
+**7.** If you want to see how everything fits together, you can run the following to generate a flowchart of the various steps. Alternatively, we have included the [flowchart](dag.svg) for the test data to show how everything fits together. You may need to download the resulting image locally to view it properly.
 > **NOTE:** If you are using MacOSX, you will need to install `dot` using [homebrew](https://brew.sh/) or some alternative process before running the following command.
 ```
 snakemake --dag | dot -Tsvg > dag.svg
