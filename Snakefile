@@ -4,7 +4,7 @@
 # Purpose: Snakemake 16S workflow for analyzing Swift Amplicon 16S™+ITS Panel data using mothur phylotype-based approach.
 
 # Location of config file containing user-provided settings for analyzing data.
-config: "config.yaml"
+configfile: "config.yaml"
 
 # Function for aggregating list of raw sequencing files.
 mothurSamples = list(set(glob_wildcards(os.path.join('data/raw/', '{sample}_{readNum, R[12]}_001.fastq.gz')).sample))
@@ -12,19 +12,14 @@ mothurSamples = list(set(glob_wildcards(os.path.join('data/raw/', '{sample}_{rea
 # Master rule for controlling workflow.
 rule all:
 	input:
-		expand("data/process/{group}.final.count.summary",
-			group = config["mothurGroups"]),
-		expand("data/process/{group}.final.0.03.subsample.shared",
-			group = ['sample','mock']),
-		"data/process/sample.final.groups.rarefaction",
+		"data/process/sample.final.1.subsample.shared",
 		"data/process/sample.final.groups.ave-std.summary",
-		expand("data/process/sample.final.{beta}.0.03.lt.ave.dist",
+		expand("data/process/sample.final.{beta}.1.lt.ave.dist",
 			beta = config["mothurBeta"]),
-		expand("data/process/sample.final.{beta}.0.03.lt.ave.nmds.axes",
+		expand("data/process/sample.final.{beta}.1.lt.ave.nmds.axes",
 			beta = config["mothurBeta"]),
-		expand("data/process/sample.final.{beta}.0.03.lt.ave.pcoa.axes",
-			beta = config["mothurBeta"]),
-		"data/process/error_analysis/errorinput.pick.error.summary"
+		expand("data/process/sample.final.{beta}.1.lt.ave.pcoa.axes",
+			beta = config["mothurBeta"])
 	shell:
 		"""
 		mkdir -p logs/mothur/
@@ -88,11 +83,10 @@ rule split16SShared:
 		script="code/mothurSplitShared.sh",
 		shared=rules.make16SShared.output.shared
 	output:
-		shared=expand("data/process/{group}.final.shared",
-			group = config["mothurGroups"])
+		shared="data/process/sample.final.shared"
 	params:
-		controlGroups='-'.join(config["mothurControl"]), # Concatenates all control group names with hyphens
-		mockGroups='-'.join(config["mothurMock"]) # Concatenates all mock group names with hyphens
+		mockGroups='-'.join(config["mothurMock"]) if config["mothurMock"] else '\"\"', # Concatenates all mock group names with hyphens
+		controlGroups='-'.join(config["mothurControl"]) if config["mothurControl"] else '\"\"' # Concatenates all control group names with hyphens
 	conda:
 		"envs/mothur.yaml"
 	shell:
@@ -103,9 +97,9 @@ rule split16SShared:
 rule count16SShared:
 	input:
 		script="code/mothurCountShared.sh",
-		shared="data/process/{group}.final.shared"
+		shared=rules.split16SShared.output.shared
 	output:
-		count="data/process/{group}.final.count.summary"
+		count="data/process/sample.final.count.summary"
 	conda:
 		"envs/mothur.yaml"
 	shell:
@@ -117,10 +111,10 @@ rule count16SShared:
 rule subsample16SShared:
 	input:
 		script="code/mothurSubsampleShared.sh",
-		shared="data/process/{group}.final.shared",
-		count="data/process/{group}.final.count.summary"
+		shared=rules.split16SShared.output.shared,
+		count=rules.count16SShared.output.count
 	output:
-		subsampleShared="data/process/{group}.final.0.03.subsample.shared"
+		subsampleShared="data/process/sample.final.1.subsample.shared"
 	params:
 		subthresh=config["subthresh"]
 	conda:
@@ -142,8 +136,8 @@ rule subsample16SShared:
 rule calc16SAlphaDiversity:
 	input:
 		script="code/mothurAlpha.sh",
-		shared="data/process/sample.final.shared",
-		count="data/process/sample.final.count.summary"
+		shared=rules.split16SShared.output.shared,
+		count=rules.count16SShared.output.count
 	output:
 		alpha="data/process/sample.final.groups.ave-std.summary"
 	params:
@@ -159,10 +153,10 @@ rule calc16SAlphaDiversity:
 rule calc16SBetaDiversity:
 	input:
 		script="code/mothurBeta.sh",
-		shared="data/process/sample.final.shared",
-		count="data/process/sample.final.count.summary"
+		shared=rules.split16SShared.output.shared,
+		count=rules.count16SShared.output.count
 	output:
-		dist=expand("data/process/sample.final.{beta}.0.03.lt.ave.dist",
+		dist=expand("data/process/sample.final.{beta}.1.lt.ave.dist",
 			beta = config["mothurBeta"])
 	params:
 		subthresh=config["subthresh"],
@@ -186,10 +180,10 @@ rule calc16SBetaDiversity:
 rule calc16SPCoA:
 	input:
 		script="code/mothurPCoA.sh",
-		dist="data/process/sample.final.{beta}.0.03.lt.ave.dist"
+		dist="data/process/sample.final.{beta}.1.lt.ave.dist"
 	output:
-		loadings="data/process/sample.final.{beta}.0.03.lt.ave.pcoa.loadings",
-		axes="data/process/sample.final.{beta}.0.03.lt.ave.pcoa.axes"
+		loadings="data/process/sample.final.{beta}.1.lt.ave.pcoa.loadings",
+		axes="data/process/sample.final.{beta}.1.lt.ave.pcoa.axes"
 	conda:
 		"envs/mothur.yaml"
 	shell:
@@ -200,10 +194,10 @@ rule calc16SPCoA:
 rule calc16SNMDS:
 	input:
 		script="code/mothurNMDS.sh",
-		dist="data/process/sample.final.{beta}.0.03.lt.ave.dist"
+		dist="data/process/sample.final.{beta}.1.lt.ave.dist"
 	output:
-		stress="data/process/sample.final.{beta}.0.03.lt.ave.nmds.stress",
-		axes="data/process/sample.final.{beta}.0.03.lt.ave.nmds.axes"
+		stress="data/process/sample.final.{beta}.1.lt.ave.nmds.stress",
+		axes="data/process/sample.final.{beta}.1.lt.ave.nmds.axes"
 	params:
 		seed=config["seed"]
 	conda:
