@@ -23,13 +23,13 @@ cd Swift_Mothur16SITS_2019/
 
 **2.** Transfer all of your raw paired-end sequencing data into `data/raw/`. The repository comes with some test data already included so if you would like to see how the pipeline works, skip to **Step 3**.
 > **NOTE:** Because of the way `mothur` parses sample names, it doesn't like it when you have hyphens or underscores in the **sample names** (emphasis on sample names, **not** the filename itself). There is a script (`code/mothurNames.sh`) you can use to change hyphens to something else. Feel free to modify it for removing extra underscores as needed.
-
-<br />
-
-E.g. a sequence file from mouse 10, day 10:  
-* **BAD** = *M10-10*_S91_L001_R1_001.fastq.gz  
-* **BAD** = *M10_10*_S91_L001_R1_001.fastq.gz  
-* **GOOD** = *M10D10*_S91_L001_R1_001.fastq.gz
+>
+> <br />
+>
+> E.g. a sequence file from mouse 10, day 10:  
+> * **BAD** = *M10-10*_S91_L001_R1_001.fastq.gz  
+> * **BAD** = *M10_10*_S91_L001_R1_001.fastq.gz  
+> * **GOOD** = *M10D10*_S91_L001_R1_001.fastq.gz
 
 <br />
 
