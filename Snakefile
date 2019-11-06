@@ -204,3 +204,21 @@ rule calc16SNMDS:
 		"envs/mothur.yaml"
 	shell:
 		"bash {input.script} {input.dist} {params.seed}"
+
+
+
+
+
+##################################################################
+#
+# Part 5: Cleaning 
+#
+##################################################################
+
+# Resets directory by deleting all files created by this workflow.
+rule clean:
+	shell:
+		"""
+		echo PROGRESS: Removing all workflow output.
+		rm -rf data/references/ data/process/
+		"""
