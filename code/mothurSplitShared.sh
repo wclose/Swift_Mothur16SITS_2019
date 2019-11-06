@@ -7,12 +7,28 @@
 ##################
 
 # Set the variables to be used in this script
-export CONTROLGROUPS=${1:?ERROR: Need to define CONTROLGROUPS.} # List of control groups in raw data dir separated by '-'
-export MOCKGROUPS=${2:?ERROR: Need to define MOCKGROUPS.} # List of mock groups in raw data dir separated by '-'
+export MOCKGROUPS=$1 # List of mock groups in raw data dir separated by '-'
+export CONTROLGROUPS=$2 # List of control groups in raw data dir separated by '-'
 
 # Other variables
 export OUTDIR=data/process/
-export COMBINEDGROUPS=$(echo "${CONTROLGROUPS}"-"${MOCKGROUPS}") # Combines the list of mock and control groups into a single string separated by '-'
+
+# Making list of all non-sample groups for removal from master shared file. Combines CONTROLGROUPS 
+# and MOCKGROUPS inputs if both were specified as inputs to script. If neither set of groups was
+# specified, COMBINEDGROUPS will not be assigned/exist in shell.
+if [ -n "${MOCKGROUPS}" -a -n "${CONTROLGROUPS}" ]; then
+
+	export COMBINEDGROUPS=$(echo "${MOCKGROUPS}"-"${CONTROLGROUPS}") # Combines the list of mock and control groups into a single string separated by '-'
+
+elif [ -n "${MOCKGROUPS}" ]; then
+
+	export COMBINEDGROUPS=$(echo "${MOCKGROUPS}")
+
+elif [ -n "${CONTROLGROUPS}" ]; then
+
+	export COMBINEDGROUPS=$(echo "${CONTROLGROUPS}")
+
+fi
 
 
 
@@ -23,30 +39,54 @@ export COMBINEDGROUPS=$(echo "${CONTROLGROUPS}"-"${MOCKGROUPS}") # Combines the 
 # Sample shared file
 echo PROGRESS: Creating sample shared file.
 
-# Removing all mock and control groups from shared file leaving only samples
-mothur "#remove.groups(shared="${OUTDIR}"/final.shared, groups="${COMBINEDGROUPS}")"
+# If COMBINEDGROUPS has been defined above (meaning one or both of MOCKGROUPS and CONTROLGROUPS)
+# was given as input, remove those groups from the master shared file to create the sample shared
+# file.
+if [ -n "${COMBINEDGROUPS}" ]; then
 
-# Renaming output file
-mv "${OUTDIR}"/final.0.03.pick.shared "${OUTDIR}"/sample.final.shared
+	# Removing all mock and control groups from shared file leaving only samples
+	echo mothur "#remove.groups(shared="${OUTDIR}"/final.shared, groups="${COMBINEDGROUPS}")"
+
+	# Renaming output file
+	echo mv "${OUTDIR}"/final.0.03.pick.shared "${OUTDIR}"/sample.final.shared
+
+# Else if none of those groups are specified, it is inferred that the master shared file only
+# contains samples and no controls/mocks.
+else
+
+	# Renaming output file
+	echo cp "${OUTDIR}"/final.shared "${OUTDIR}"/sample.final.shared
+
+fi
 
 
 
-# Control shared file
-echo PROGRESS: Creating control shared file.
+# If MOCKGROUPS was defined as input, create a shared file containing only specified mock samples.
+if [ -n "${MOCKGROUPS}" ]; then
 
-# Removing any non-control groups from shared file
-mothur "#get.groups(shared="${OUTDIR}"/final.shared, groups="${CONTROLGROUPS}")"
+	# Mock shared file
+	echo PROGRESS: Creating mock shared file.
 
-# Renaming output file
-mv "${OUTDIR}"/final.0.03.pick.shared "${OUTDIR}"/control.final.shared
+	# Removing non-mock groups from shared file
+	echo mothur "#get.groups(shared="${OUTDIR}"/final.shared, groups="${MOCKGROUPS}")"
+
+	# Renaming output file
+	echo mv "${OUTDIR}"/final.0.03.pick.shared "${OUTDIR}"/mock.final.shared
+
+fi
 
 
 
-# Mock shared file
-echo PROGRESS: Creating mock shared file.
+# If CONTROLGROUPS was defined as input, create a shared file containing only specified control samples.
+if [ -n "${CONTROLGROUPS}" ]; then
 
-# Removing non-mock groups from shared file
-mothur "#get.groups(shared="${OUTDIR}"/final.shared, groups="${MOCKGROUPS}")"
+	# Control shared file
+	echo PROGRESS: Creating control shared file.
 
-# Renaming output file
-mv "${OUTDIR}"/final.0.03.pick.shared "${OUTDIR}"/mock.final.shared
+	# Removing any non-control groups from shared file
+	echo mothur "#get.groups(shared="${OUTDIR}"/final.shared, groups="${CONTROLGROUPS}")"
+
+	# Renaming output file
+	echo mv "${OUTDIR}"/final.0.03.pick.shared "${OUTDIR}"/control.final.shared
+
+fi
