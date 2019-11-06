@@ -17,8 +17,9 @@ export OUTDIR=data/process/
 # and MOCKGROUPS inputs if both were specified as inputs to script. If neither set of groups was
 # specified, COMBINEDGROUPS will not be assigned/exist in shell.
 if [ -n "${MOCKGROUPS}" -a -n "${CONTROLGROUPS}" ]; then
-
-	export COMBINEDGROUPS=$(echo "${MOCKGROUPS}"-"${CONTROLGROUPS}") # Combines the list of mock and control groups into a single string separated by '-'
+	
+	# Combines the list of mock and control groups into a single string separated by '-'
+	export COMBINEDGROUPS=$(echo "${MOCKGROUPS}"-"${CONTROLGROUPS}")
 
 elif [ -n "${MOCKGROUPS}" ]; then
 
@@ -45,17 +46,17 @@ echo PROGRESS: Creating sample shared file.
 if [ -n "${COMBINEDGROUPS}" ]; then
 
 	# Removing all mock and control groups from shared file leaving only samples
-	echo mothur "#remove.groups(shared="${OUTDIR}"/final.shared, groups="${COMBINEDGROUPS}")"
+	mothur "#remove.groups(shared="${OUTDIR}"/final.shared, groups="${COMBINEDGROUPS}")"
 
 	# Renaming output file
-	echo mv "${OUTDIR}"/final.0.03.pick.shared "${OUTDIR}"/sample.final.shared
+	mv "${OUTDIR}"/final.1.pick.shared "${OUTDIR}"/sample.final.shared
 
 # Else if none of those groups are specified, it is inferred that the master shared file only
 # contains samples and no controls/mocks.
 else
 
 	# Renaming output file
-	echo cp "${OUTDIR}"/final.shared "${OUTDIR}"/sample.final.shared
+	cp "${OUTDIR}"/final.shared "${OUTDIR}"/sample.final.shared
 
 fi
 
@@ -68,10 +69,10 @@ if [ -n "${MOCKGROUPS}" ]; then
 	echo PROGRESS: Creating mock shared file.
 
 	# Removing non-mock groups from shared file
-	echo mothur "#get.groups(shared="${OUTDIR}"/final.shared, groups="${MOCKGROUPS}")"
+	mothur "#get.groups(shared="${OUTDIR}"/final.shared, groups="${MOCKGROUPS}")"
 
 	# Renaming output file
-	echo mv "${OUTDIR}"/final.0.03.pick.shared "${OUTDIR}"/mock.final.shared
+	mv "${OUTDIR}"/final.1.pick.shared "${OUTDIR}"/mock.final.shared
 
 fi
 
@@ -84,9 +85,9 @@ if [ -n "${CONTROLGROUPS}" ]; then
 	echo PROGRESS: Creating control shared file.
 
 	# Removing any non-control groups from shared file
-	echo mothur "#get.groups(shared="${OUTDIR}"/final.shared, groups="${CONTROLGROUPS}")"
+	mothur "#get.groups(shared="${OUTDIR}"/final.shared, groups="${CONTROLGROUPS}")"
 
 	# Renaming output file
-	echo mv "${OUTDIR}"/final.0.03.pick.shared "${OUTDIR}"/control.final.shared
+	mv "${OUTDIR}"/final.1.pick.shared "${OUTDIR}"/control.final.shared
 
 fi
