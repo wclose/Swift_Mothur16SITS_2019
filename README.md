@@ -21,7 +21,7 @@ cd Swift_Mothur16SITS_2019/
 
 <br />
 
-**2.** Transfer all of your raw paired-end sequencing data into `data/raw/` in this repo. The repository comes with some test data already included so if you would like to see how the pipeline works, skip to **Step 3**.
+**2.** Transfer all of your raw paired-end sequencing data into `data/raw/`. The repository comes with some test data already included so if you would like to see how the pipeline works, skip to **Step 3**.
 > **NOTE:** Because of the way `mothur` parses sample names, it doesn't like it when you have hyphens or underscores in the **sample names** (emphasis on sample names, **not** the filename itself). There is a script (`code/mothurNames.sh`) you can use to change hyphens to something else. Feel free to modify it for removing extra underscores as needed.
 
 <br />
@@ -69,7 +69,7 @@ Things to change (everything else can/should be left as is):
 
 <br />
 
-**6.** Test the workflow to make sure everything looks good.
+**6.** Test the workflow to make sure everything looks good. This will print a list of the commands to be executed without running them and will error if something isn't set properly.
 ```
 snakemake -np
 ```
@@ -84,7 +84,7 @@ snakemake --dag | dot -Tsvg > dag.svg
 
 <br />
 
-**8.** Run the workflow to generate the desired outputs. All of the results will be available in `data/mothur/process/` when the workflow is completed. Should something go wrong, all of the log files will be available in `logs/mothur/`.
+**8.** Run the workflow to generate the desired outputs. All of the results will be available in `data/process/` when the workflow is completed. Should something go wrong, all of the log files will be available in `logs/mothur/`.
 ```
 snakemake --use-conda
 ```
