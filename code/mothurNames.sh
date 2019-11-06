@@ -10,7 +10,7 @@
 export SAMPLEDIR=${1:?ERROR: Need to define SAMPLEDIR.}
 
 # Character(s) to be used in place of hyphens
-export REPLACEMENT=${2:?ERROR: Need to define REPLACEMENT.} # Character to use when replacing hyphens
+export REPLACEMENT=$2 # Character to use when replacing hyphens
 
 
 
